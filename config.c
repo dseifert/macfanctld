@@ -37,6 +37,9 @@ float temp_TC0P_ceiling = 50;
 float temp_TG0P_floor = 40;
 float temp_TG0P_ceiling = 50;
 
+float temp_TG0D_floor = 45;
+float temp_TG0D_ceiling = 50;
+
 float fan_min = 0;
 float fan_max = 6200;			// fixed max value
 
@@ -244,6 +247,9 @@ void read_cfg(char* name)
 		temp_TG0P_ceiling = read_param("temp_TG0P_ceiling",	0, 90, 80);
 		temp_TG0P_floor = read_param("temp_TG0P_floor",		0, temp_TG0P_ceiling - 1, 65);
 
+		temp_TG0P_ceiling = read_param("temp_TG0D_ceiling",	0, 90, 50);
+		temp_TG0P_floor = read_param("temp_TG0D_floor",		0, temp_TG0D_ceiling - 1, 45);
+
 		temp_max_ceiling = read_param("temp_max_ceiling", 0, 90, 80);
 		temp_max_floor = read_param("temp_max_floor", 0, temp_max_ceiling - 1, 65);
 
@@ -275,6 +281,9 @@ void read_cfg(char* name)
 
 	printf("\ttemp_TG0P_floor: %.0f\n", temp_TG0P_floor);
 	printf("\ttemp_TG0P_ceiling: %.0f\n", temp_TG0P_ceiling);
+
+	printf("\ttemp_TG0D_floor: %.0f\n", temp_TG0D_floor);
+	printf("\ttemp_TG0D_ceiling: %.0f\n", temp_TG0D_ceiling);
 
 	printf("\tfan_min: %.0f\n", fan_min);
 

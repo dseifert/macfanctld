@@ -90,12 +90,14 @@ float temp_max = 0;
 struct sensor *sensors = NULL;
 struct sensor *sensor_TC0P = NULL;
 struct sensor *sensor_TG0P = NULL;
+struct sensor *sensor_TG0D = NULL;
 
 #define CTL_NONE	0	// sensor control fan flags
 #define CTL_AVG		1
 #define CTL_TC0P	2
 #define CTL_TG0P	3
-#define CTL_MAX		4
+#define CTL_TG0D	4
+#define CTL_MAX		5
 
 int fan_ctl = 0;		// which sensor controls fan
 
@@ -292,6 +294,20 @@ void calc_fan()
 		}
 	}
 
+	// calc fan speed for TG0D
+
+	if(sensor_TG0D != NULL)
+	{
+		float temp_window = temp_TG0D_ceiling - temp_TG0D_floor;
+		float normalized_temp =(sensor_TG0D->value - temp_TG0D_floor) / temp_window;
+		float fan_TG0D_speed =fan_min + (normalized_temp * fan_window);
+		if(fan_TG0D_speed > fan_speed)
+		{
+			fan_speed = fan_TG0D_speed;
+			fan_ctl = CTL_TG0D;
+		}
+	}
+
 	// finally clamp
 
 	fan_speed = min(fan_max, fan_speed);
@@ -385,6 +401,7 @@ void scan_sensors()
 
 	sensor_TC0P = NULL;
 	sensor_TG0P = NULL;
+	sensor_TG0D = NULL;
 
 	// get number of fans
 
@@ -513,6 +530,10 @@ void scan_sensors()
 				{
 					sensor_TG0P = &sensors[i];
 				}
+				else if(strcmp(sensors[i].name, "TG0D") == 0)
+				{
+					sensor_TG0D = &sensors[i];
+				}
 			}
 
 			// print out sensor information.
@@ -572,6 +593,13 @@ void logger()
 			printf(", %sTG0P: %.1fC" ,
 				   fan_ctl == CTL_TG0P ? "*" : " ",
 				   sensor_TG0P->value);
+		}
+
+		if(sensor_TG0D != NULL)
+		{
+			printf(", %sTG0D: %.1fC" ,
+				   fan_ctl == CTL_TG0D ? "*" : " ",
+				   sensor_TG0D->value);
 		}
 
 		if(log_level > 1)
